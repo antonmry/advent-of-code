@@ -1,33 +1,28 @@
 package com.galiglobal;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class Challenge2_2 {
 
-    public record Command(String direction, int value) {
+    public record Location(String lastDirection, int lastValue, int position, int depth, int aim) {
+        public int getResult() {
+            return position * depth;
+        }
     }
 
-    public record Location(int position, int depth, int aim) {
-    }
-
-    public static Location l = new Location(0, 0, 0);
+    public final static Location l = new Location("", 0, 0, 0, 0);
 
     public static int getPositionDepthMultiply(String input) {
-        Arrays.
+        return Arrays.
             stream(input.split(System.getProperty("line.separator"))).
             map(String::trim).
-            map(s -> new Command(s.substring(0, s.indexOf(' ')), Integer.valueOf(s.substring(s.indexOf(' ') + 1)))).
-            map(c -> switch (c.direction) {
-                case "forward" -> new Location(l.position + c.value, l.depth + c.value * l.aim, l.aim);
-                case "up" -> new Location(l.position, l.depth, l.aim - c.value);
-                case "down" -> new Location(l.position, l.depth, l.aim + c.value);
+            map(s -> new Location(s.substring(0, s.indexOf(' ')), Integer.valueOf(s.substring(s.indexOf(' ') + 1)), 0, 0, 0)).
+            reduce(l, (s, e) -> switch (e.lastDirection) {
+                case "forward" -> new Location("", 0, s.position + e.lastValue, s.depth + e.lastValue * s.aim, s.aim);
+                case "up" -> new Location("", 0, s.position, s.depth, s.aim - e.lastValue);
+                case "down" -> new Location("", 0, s.position, s.depth, s.aim + e.lastValue);
                 default -> l;
-            }).
-            forEach(location -> l = location);
-
-        return l.position * l.depth;
+            }).getResult();
     }
 }
 

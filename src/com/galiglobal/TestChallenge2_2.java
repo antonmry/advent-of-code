@@ -13,7 +13,7 @@ class TestChallenge2_2 {
 
     @Test
     void testChallenge() {
-        assertEquals(2070300, Challenge2_2.getPositionDepthMultiply(challenge));
+        assertEquals(2078985210, Challenge2_2.getPositionDepthMultiply(challenge));
     }
 
     private static String challenge = """
