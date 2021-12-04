@@ -1,32 +1,29 @@
-package com.galiglobal;
+package com.galiglobal.advent.year2021;
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
+import org.junit.jupiter.api.Test;
 
-public class Challenge1_2 {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    public static int previous = -1;
+class TestChallenge1_1 {
 
-    public static void main(String[] args) {
-
-        System.out.println("Result: " + getSumThreeSlideWindow(challenge));
+    @Test
+    void testExample() {
+        assertEquals(7, Challenge1_1.getPrevMeasurementCount(example));
     }
 
-    public static int getSumThreeSlideWindow(String input) {
+    @Test
+    void testChallenge() {
+        assertEquals(1226, Challenge1_1.getPrevMeasurementCount(challenge));
+    }
 
-        var arr = Arrays.stream(
-                input.split(System.getProperty("line.separator"))
-            ).
-            map(String::trim).
-            map(Integer::valueOf).
-            toList();
+    @Test
+    void testExampleWithState() {
+        assertEquals(7, Challenge1_1.getPrevMeasurementCountWithStatus(example));
+    }
 
-        return IntStream.range(0, arr.size() - 2).
-            map(i -> switch (i) {
-                    case 0 -> 0;
-                    default -> (arr.get(i - 1) + arr.get(i) + arr.get(i + 1) < arr.get(i) + arr.get(i + 1) + arr.get(i + 2)) ? 1 : 0;
-                }
-            ).sum();
+    @Test
+    void testChallengeWithState() {
+        assertEquals(1226, Challenge1_1.getPrevMeasurementCountWithStatus(challenge));
     }
 
     private static String challenge = """

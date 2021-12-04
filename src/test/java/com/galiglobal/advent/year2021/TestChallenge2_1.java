@@ -1,19 +1,19 @@
-package com.galiglobal;
+package com.galiglobal.advent.year2021;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestChallenge2_2 {
+class TestChallenge2_1 {
 
     @Test
     void testExample() {
-        assertEquals(900, Challenge2_2.getPositionDepthMultiply(example));
+        assertEquals(150, Challenge2_1.getPositionDepthMultiply(example));
     }
 
     @Test
     void testChallenge() {
-        assertEquals(2078985210, Challenge2_2.getPositionDepthMultiply(challenge));
+        assertEquals(2070300, Challenge2_1.getPositionDepthMultiply(challenge));
     }
 
     private static String challenge = """

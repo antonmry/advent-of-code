@@ -1,8 +1,8 @@
-package com.galiglobal;
+package com.galiglobal.advent.year2021;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestChallenge1_2 {
 

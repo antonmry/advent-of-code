@@ -1,19 +1,22 @@
-package com.galiglobal;
+package com.galiglobal.advent.year2021;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class TestChallenge3_1 {
+class TestChallenge3_2 {
 
     @Test
     void testExample() {
-        assertEquals(198, Challenge3_1.getPowerConsumption(example));
+        assertEquals(230, Challenge3_2.getLifeSupportRating(example));
     }
 
     @Test
     void testChallenge() {
-        assertEquals(2972336, Challenge3_1.getPowerConsumption(challenge));
+        assertNotEquals(2968959, Challenge3_2.getLifeSupportRating(challenge));
+        assertNotEquals(2929857, Challenge3_2.getLifeSupportRating(challenge));
+        assertEquals(3368358, Challenge3_2.getLifeSupportRating(challenge));
     }
 
     private static String challenge = """

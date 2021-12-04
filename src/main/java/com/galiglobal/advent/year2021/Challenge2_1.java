@@ -1,4 +1,4 @@
-package com.galiglobal;
+package com.galiglobal.advent.year2021;
 
 import java.util.Arrays;
 import java.util.function.Supplier;

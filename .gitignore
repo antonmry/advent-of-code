@@ -1,24 +1,42 @@
-.DS_Store
-*.log
-.emacs.*
-.lock
-/build
-Dockerfile
+#Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
 
-*.iws
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# IntelliJ
+.idea
 *.ipr
 *.iml
-*.swp
-/out
-/.settings/
-.idea
+*.iws
 
-.classpath
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
 .factorypath
-.project
-.settings
-.gradle
-.metadata
-.apt_generated
-/classes/
-.nos
+
+# OSX
+.DS_Store
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+#JReleaser
+out/
