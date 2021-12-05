@@ -23,11 +23,11 @@ import java.util.stream.Stream;
 
 public class Challenge4_1 {
 
-    public static long getFinalScore(String input) {
+    public static int getFinalScore(String input) {
 
         List<String> inputList = getInputList(input);
-        Optional<Board> winnerBoard = getWinnerBoard(getRandomOrder(inputList), getBoards(inputList));
-        return calculateSumUnmarked(winnerBoard) * calculateLastElement(winnerBoard);
+        Board winnerBoard = getWinnerBoard(getRandomOrder(inputList), getBoards(inputList)).orElseThrow();
+        return calculateSumUnmarked(winnerBoard) * winnerBoard.lastNumber;
     }
 
     private static List<String> getInputList(String input) {
@@ -39,14 +39,14 @@ public class Challenge4_1 {
 
     private static Stream<Integer> getRandomOrder(List<String> inputList) {
         return Arrays.stream(inputList.get(0).split(","))
-                .map(s -> Integer.valueOf(s));
+                .map(Integer::valueOf);
     }
 
     private static List<Board> getBoards(List<String> inputList) {
         return IntStream.range(0, (inputList.size() - 1) / 6)
                 .mapToObj(i -> IntStream.range(2, 7)
                         .mapToObj(j -> inputList.get(i * 6 + j))
-                        .map(s -> getRow(s))
+                        .map(Challenge4_1::getRow)
                         .toList())
                 .map(b -> new Board(b, false, -1))
                 .toList();
@@ -55,20 +55,14 @@ public class Challenge4_1 {
     private static Optional<Board> getWinnerBoard(Stream<Integer> randomOrder, List<Board> boards) {
         return randomOrder
                 .reduce(boards,
-                        (subtotal, element) -> Board.updateBoard(subtotal, element),
+                        Board::updateBoard,
                         Board::returnNextElement)
                 .stream()
                 .filter(b -> b.winner).findFirst();
     }
 
-    private static int calculateLastElement(Optional<Board> winnerBoard) {
-        return winnerBoard.stream().mapToInt(l -> l.lastNumber).findFirst().getAsInt();
-    }
-
-    private static int calculateSumUnmarked(Optional<Board> winnerBoard) {
-        return winnerBoard.stream()
-                .map(v -> v.cells)
-                .flatMap(List::stream)
+    private static int calculateSumUnmarked(Board winnerBoard) {
+        return winnerBoard.cells.stream()
                 .flatMap(List::stream)
                 .filter(cell -> !cell.marked)
                 .mapToInt(cell -> cell.value)
@@ -77,7 +71,7 @@ public class Challenge4_1 {
 
     private static List<Cell> getRow(String boardLine) {
         return Arrays.stream(boardLine.replace("  ", " ").split(" "))
-                .map(v -> new Cell(Integer.valueOf(v), false))
+                .map(v -> new Cell(Integer.parseInt(v), false))
                 .toList();
     }
 

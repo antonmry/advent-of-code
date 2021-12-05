@@ -25,7 +25,7 @@ public class Challenge4_2 {
 
     public static int getFinalScore(String input) {
         List<String> inputList = getInputList(input);
-        Board winnerBoard = getLastWinnerBoard(getRandomOrder(inputList), getBoards(inputList)).get();
+        Board winnerBoard = getLastWinnerBoard(getRandomOrder(inputList), getBoards(inputList)).orElseThrow();
         return calculateSumUnmarked(winnerBoard) * winnerBoard.lastNumber;
     }
 
@@ -70,7 +70,7 @@ public class Challenge4_2 {
 
     private static List<Cell> getRow(String boardLine) {
         return Arrays.stream(boardLine.replace("  ", " ").split(" "))
-                .map(v -> new Cell(Integer.valueOf(v), false))
+                .map(v -> new Cell(Integer.parseInt(v), false))
                 .toList();
     }
 
