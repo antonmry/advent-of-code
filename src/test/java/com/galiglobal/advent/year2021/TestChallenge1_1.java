@@ -31,17 +31,7 @@ class TestChallenge1_1 {
         assertEquals(1226, Challenge1_1.getPrevMeasurementCount(challenge));
     }
 
-    @Test
-    void testExampleWithState() {
-        assertEquals(7, Challenge1_1.getPrevMeasurementCountWithStatus(example));
-    }
-
-    @Test
-    void testChallengeWithState() {
-        assertEquals(1226, Challenge1_1.getPrevMeasurementCountWithStatus(challenge));
-    }
-
-    private static String challenge = """
+    private static final String challenge = """
             169
             150
             158
@@ -2043,7 +2033,7 @@ class TestChallenge1_1 {
             3586
             3588""";
 
-    private static String example = """
+    private static final String example = """
             199
             200
             208

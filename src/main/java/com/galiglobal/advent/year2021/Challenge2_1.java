@@ -26,7 +26,7 @@ public class Challenge2_1 {
 
     public static int getPositionDepthMultiply(String input) {
         Supplier<Stream<Command>> commandStream = () -> Arrays.stream(input.split(System.getProperty("line.separator"))).map(String::trim)
-                .map(s -> new Command(s.substring(0, s.indexOf(' ')), Integer.valueOf(s.substring(s.indexOf(' ') + 1))));
+                .map(s -> new Command(s.substring(0, s.indexOf(' ')), Integer.parseInt(s.substring(s.indexOf(' ') + 1))));
 
         return getPosition(commandStream.get()) * getDepth(commandStream.get());
     }

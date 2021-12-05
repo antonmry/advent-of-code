@@ -21,6 +21,7 @@ public class Challenge3_1 {
 
     public static int getPowerConsumption(String input) {
 
+        // TODO: this exercise needs refactoring
         var inputList = Arrays
                 .stream(input.split(System.getProperty("line.separator")))
                 .map(String::trim)

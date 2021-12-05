@@ -31,7 +31,7 @@ class TestChallenge2_2 {
         assertEquals(2078985210, Challenge2_2.getPositionDepthMultiply(challenge));
     }
 
-    private static String challenge = """
+    private static final String challenge = """
             forward 2
             down 9
             up 6
@@ -1033,7 +1033,7 @@ class TestChallenge2_2 {
             down 3
             forward 4""";
 
-    private static String example = """
+    private static final String example = """
             forward 5
             down 5
             forward 8

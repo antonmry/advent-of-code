@@ -34,7 +34,7 @@ class TestChallenge3_2 {
         assertEquals(3368358, Challenge3_2.getLifeSupportRating(challenge));
     }
 
-    private static String challenge = """
+    private static final String challenge = """
             001110000001
             010100101000
             101101010010
@@ -1036,7 +1036,7 @@ class TestChallenge3_2 {
             010001011110
             001101010010""";
 
-    private static String example = """
+    private static final String example = """
             00100
             11110
             10110

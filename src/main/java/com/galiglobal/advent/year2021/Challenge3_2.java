@@ -22,6 +22,7 @@ public class Challenge3_2 {
 
     public static long getLifeSupportRating(String input) {
 
+        // TODO: this class needs serious refactoring but it's too late today
         var inputList = Arrays
                 .stream(input.split(System.getProperty("line.separator")))
                 .map(String::trim)
@@ -33,7 +34,6 @@ public class Challenge3_2 {
         var length = inputList.get(0).length();
 
         // TODO: more functional approach?
-        // TODO: this class needs serious refactoring but it's too late today
         for (int x = 0; x < length; x++) {
 
             // OxygenGeneratorRate

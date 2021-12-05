@@ -31,7 +31,7 @@ class TestChallenge1_2 {
         assertEquals(1252, Challenge1_2.getSumThreeSlideWindow(challenge));
     }
 
-    private static String challenge = """
+    private static final String challenge = """
             169
             150
             158
@@ -2033,7 +2033,7 @@ class TestChallenge1_2 {
             3586
             3588""";
 
-    private static String example = """
+    private static final String example = """
             199
             200
             208
