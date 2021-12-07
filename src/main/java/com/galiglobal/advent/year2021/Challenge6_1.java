@@ -24,7 +24,7 @@ public class Challenge6_1 {
         final List<Integer> inputList = Arrays.stream(input.split(","))
             .map(Integer::parseInt)
             .toList();
-        return countFishPerDay(inputList, day).stream().count();
+        return countFishPerDay(inputList, day).size();
     }
 
     // TODO: we choose the recursive solution but it may be possible to calculate
