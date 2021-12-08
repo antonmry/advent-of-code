@@ -27,18 +27,18 @@ public class Challenge7_1 {
         return calculateFuel(inputList.stream().max(Integer::compareTo).orElseThrow());
     }
 
-    // Recursive solution: why not? Just for fun
-    private static long calculateFuel(Integer position) {
-        final int fuel = inputList.stream().mapToInt(i -> Math.abs(i - position)).sum();
-        if (position == 0)
-            return fuel;
-        final long nextFuel = calculateFuel(position - 1);
-        return (nextFuel < fuel) ? nextFuel : fuel;
-    }
-
     private static List<Integer> getInputList(String input) {
         return Arrays.stream(input.split(","))
                 .map(Integer::parseInt)
                 .toList();
+    }
+
+    // Recursive solution: why not? Just for fun
+    private static long calculateFuel(Integer position) {
+        final long fuel = inputList.stream().mapToInt(i -> Math.abs(i - position)).sum();
+        if (position == 0)
+            return fuel;
+        final long nextFuel = calculateFuel(position - 1);
+        return (nextFuel < fuel) ? nextFuel : fuel;
     }
 }

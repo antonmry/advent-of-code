@@ -36,14 +36,14 @@ public class Challenge7_2 {
 
     // Recursive solution: why not? Just for fun
     private static long calculateFuel(Integer position) {
-        final int fuel = inputList.stream().mapToInt(c -> getRequiredFuel(position, c)).sum();
+        final long fuel = inputList.stream().mapToLong(c -> getRequiredFuel(position, c)).sum();
         if (position == 0)
             return fuel;
         final long nextFuel = calculateFuel(position - 1);
         return (nextFuel < fuel) ? nextFuel : fuel;
     }
 
-    private static int getRequiredFuel(Integer position, Integer i) {
+    private static long getRequiredFuel(Integer position, Integer i) {
         return IntStream.rangeClosed(0, Math.abs(i - position)).sum();
     }
 }

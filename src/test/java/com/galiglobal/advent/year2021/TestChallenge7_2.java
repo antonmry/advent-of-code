@@ -23,12 +23,12 @@ class TestChallenge7_2 {
 
     @Test
     void testExample() {
-        assertEquals(168, Challenge7_2.calculateFuel(example));
+        assertEquals(168L, Challenge7_2.calculateFuel(example));
     }
 
     @Test
     void testChallenge() {
-        assertEquals(98257206, Challenge7_2.calculateFuel(challenge));
+        assertEquals(98257206L, Challenge7_2.calculateFuel(challenge));
     }
 
     private static final String example = "16,1,2,0,4,2,7,1,2,14";
