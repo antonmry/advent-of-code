@@ -21,25 +21,28 @@ import java.util.List;
 public class Challenge6_1 {
 
     public static long countFish(String input, int day) {
-        final List<Integer> inputList = Arrays.stream(input.split(","))
-            .map(Integer::parseInt)
-            .toList();
+        final List<Integer> inputList = getInputList(input);
         return countFishPerDay(inputList, day).size();
     }
 
-    // TODO: we choose the recursive solution but it may be possible to calculate
-    // this number mathematically. 2^day/6 - the factor of 8 days the first time
+    private static List<Integer> getInputList(String input) {
+        return Arrays.stream(input.split(","))
+                .map(Integer::parseInt)
+                .toList();
+    }
+
+    // TODO: we choose the recursive solution but it isn't efficient here
     private static List<Integer> countFishPerDay(List<Integer> inputList, int day) {
         if (day == 0)
             return inputList;
 
         return countFishPerDay(
-            inputList.stream().map(f -> switch (f) {
-                    case 0 -> List.of(6, 8);
-                    default -> List.of(f - 1);
+                inputList.stream().map(f -> switch (f) {
+                case 0 -> List.of(6, 8);
+                default -> List.of(f - 1);
                 })
-                .flatMap(List::stream)
-                .toList(),
-            day - 1);
+                        .flatMap(List::stream)
+                        .toList(),
+                day - 1);
     }
 }

@@ -29,7 +29,7 @@ class TestChallenge6_1 {
 
     @Test
     void testChallenge() {
-        assertEquals(5934, Challenge6_1.countFish(challenge, 80));
+        assertEquals(365131, Challenge6_1.countFish(challenge, 80));
     }
 
     private static final String example = "3,4,3,1,2";
