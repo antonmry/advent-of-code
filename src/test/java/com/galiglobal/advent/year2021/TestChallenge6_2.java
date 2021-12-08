@@ -19,17 +19,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestChallenge6_1 {
+class TestChallenge6_2 {
 
     @Test
     void testExample() {
-        assertEquals(26, Challenge6_1.countFish(example, 18));
-        assertEquals(5934, Challenge6_1.countFish(example, 80));
+        assertEquals(26, Challenge6_2.countFish(example, 18));
+        assertEquals(5934, Challenge6_2.countFish(example, 80));
+        assertEquals(26984457539L, Challenge6_2.countFish(example, 256));
     }
 
     @Test
     void testChallenge() {
-        assertEquals(365131, Challenge6_1.countFish(challenge, 80));
+        assertEquals(365131, Challenge6_2.countFish(challenge, 80));
+        assertEquals(1650309278600L, Challenge6_2.countFish(challenge, 256));
     }
 
     private static final String example = "3,4,3,1,2";
