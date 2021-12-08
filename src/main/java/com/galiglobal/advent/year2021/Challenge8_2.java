@@ -18,36 +18,49 @@ package com.galiglobal.advent.year2021;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Challenge8_2 {
 
     public static long sumOutputValues(String input) {
-
         return Arrays
-            .stream(input.split(System.getProperty("line.separator")))
-            .mapToInt(s -> buildDictionary(s))
-            .sum();
+                .stream(input.split(System.getProperty("line.separator")))
+                .mapToInt(Challenge8_2::getDigitsAsNumber)
+                .sum();
     }
 
-    private static int buildDictionary(String inputLine) {
+    private static int getDigitsAsNumber(String inputLine) {
+
         final List<String> inputList = Arrays.stream(inputLine
                 .substring(0, inputLine.indexOf("|"))
                 .split(" "))
-            .toList();
+                .toList();
 
+        final Map<String, String> dictionary = buildDictionary(inputList);
+
+        return Integer.parseInt(
+                Arrays.stream(inputLine
+                        .substring(inputLine.indexOf("|") + 2)
+                        .split(" "))
+                        .map(Challenge8_2::sort)
+                        .map(dictionary::get)
+                        .collect(Collectors.joining()));
+    }
+
+    private static Map<String, String> buildDictionary(List<String> inputList) {
         final Map<Integer, String> partialDictionary = inputList.stream()
-            .map(s -> switch (s.length()) {
+                .map(s -> switch (s.length()) {
                 case 2 -> Map.entry(1, s);
                 case 4 -> Map.entry(4, s);
                 default -> null;
-            })
-            .filter(v -> v != null) // TODO: do we need this?
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                })
+                .filter(Objects::nonNull) // TODO: how do we avoid this?
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final Map<String, String> dictionary = inputList.stream()
-            .map(Challenge8_2::sort)
-            .map(s -> switch (s.length()) {
+        return inputList.stream()
+                .map(Challenge8_2::sort)
+                .map(s -> switch (s.length()) {
                 case 2 -> Map.entry(s, "1");
                 case 3 -> Map.entry(s, "7");
                 case 4 -> Map.entry(s, "4");
@@ -55,18 +68,8 @@ public class Challenge8_2 {
                 case 6 -> findSixLetters(s, partialDictionary);
                 case 7 -> Map.entry(s, "8");
                 default -> throw new RuntimeException();
-            })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        final String[] s = inputLine
-            .substring(inputLine.indexOf("|") + 2)
-            .split(" "); // TODO
-
-        return Integer.parseInt(Arrays.stream(s)
-            .map(Challenge8_2::sort)
-            .map(v -> dictionary.get(v))
-            .collect(Collectors.joining())
-        );
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static Map.Entry<String, String> findSixLetters(String digit, Map<Integer, String> dictionary) {
@@ -88,18 +91,16 @@ public class Challenge8_2 {
 
     private static int getLettersInCommon(String s1, String s2) {
         return Math.toIntExact(
-            s1.chars()
-                .mapToObj(c -> String.valueOf((char) c))
-                .filter(c -> s2.contains(c))
-                .count()
-        );
+                s1.chars()
+                        .mapToObj(c -> String.valueOf((char) c))
+                        .filter(s2::contains)
+                        .count());
     }
 
     private static String sort(String s) {
         return s.chars()
-            .sorted()
-            .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-            .toString();
+                .sorted()
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
-
 }
