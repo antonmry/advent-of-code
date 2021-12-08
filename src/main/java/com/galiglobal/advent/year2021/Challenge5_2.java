@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Challenge5_1 {
+public class Challenge5_2 {
 
     private static final Pattern p = Pattern.compile("\\d+");
 
@@ -50,26 +50,72 @@ public class Challenge5_1 {
     private static List<Point> getPoints(List<Line> lines) {
         return lines.stream()
                 .map(l -> {
-                    // TODO: refactor, simplify
+                    // TODO: refactor, IntStream makes it too complex
+
+                    // Vertical lines
                     if (l.x1 == l.x2)
-                        if (l.y1 < l.y2)
-                            return IntStream.rangeClosed(l.y1, l.y2)
+                        if (l.y1 < l.y2) {
+                            final List<Point> points = IntStream.rangeClosed(l.y1, l.y2)
                                     .mapToObj(y -> new Point(l.x1, y))
                                     .toList();
-                        else
-                            return IntStream.rangeClosed(l.y2, l.y1)
+                            return points;
+                        }
+                        else {
+                            final List<Point> points = IntStream.rangeClosed(l.y2, l.y1)
                                     .mapToObj(y -> new Point(l.x1, y))
                                     .toList();
+                            return points;
+                        }
+
+                    // Horizontal lines
                     if (l.y1 == l.y2)
-                        if (l.x1 < l.x2)
-                            return IntStream.rangeClosed(l.x1, l.x2)
+                        if (l.x1 < l.x2) {
+                            final List<Point> points = IntStream.rangeClosed(l.x1, l.x2)
                                     .mapToObj(x -> new Point(x, l.y1))
                                     .toList();
-                        else
-                            return IntStream.rangeClosed(l.x2, l.x1)
+                            return points;
+                        }
+                        else {
+                            final List<Point> points = IntStream.rangeClosed(l.x2, l.x1)
                                     .mapToObj(x -> new Point(x, l.y1))
                                     .toList();
-                    return Collections.<Point> emptyList(); // Ignored if it isn't horizontal or vertical
+                            return points;
+                        }
+
+                    // An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
+                    // An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+                    if (Math.abs(l.x1 - l.x2) == Math.abs(l.y1 - l.y2))
+                        if (l.x1 < l.x2) {
+                            final List<Point> points = IntStream.rangeClosed(l.x1, l.x2)
+                                    .mapToObj(x -> new Point(x, l.y1 + (x - l.x1)))
+                                    .toList();
+                            return points;
+                        }
+                        else {
+                            final List<Point> points = IntStream.rangeClosed(l.x2, l.x1)
+                                    .mapToObj(x -> new Point(x, l.y2 + (x - l.x2)))
+                                    .toList();
+                            return points;
+                        }
+
+                    /*
+                     * // An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+                     * if ((l.x1 == l.y2) && (l.x2 == l.y1))
+                     * if (l.x1 < l.x2) {
+                     * final List<Point> points = IntStream.rangeClosed(l.x1, l.x2)
+                     * .mapToObj(x -> new Point(x, l.y1 - x))
+                     * .toList();
+                     * return points;
+                     * } else {
+                     * final List<Point> points = IntStream.rangeClosed(l.x2, l.x1)
+                     * .mapToObj(x -> new Point(x, l.y2 - x))
+                     * .toList();
+                     * return points;
+                     * }
+                     */
+
+                    // Ignore other cases
+                    return Collections.<Point> emptyList();
                 })
                 .flatMap(List::stream)
                 .toList();
