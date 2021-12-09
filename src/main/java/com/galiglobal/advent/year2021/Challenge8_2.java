@@ -49,12 +49,8 @@ public class Challenge8_2 {
 
     private static Map<String, String> buildDictionary(List<String> inputList) {
         final Map<Integer, String> partialDictionary = inputList.stream()
-                .filter(s -> (s.length() == 2) | (s.length() == 4))
-                .map(s -> switch (s.length()) {
-                case 2 -> Map.entry(1, s);
-                case 4 -> Map.entry(4, s);
-                default -> throw new RuntimeException();
-                })
+                .filter(s -> ((s.length() == 2) || (s.length() == 4)))
+                .map(v -> (v.length() == 2) ? Map.entry(1, v) : Map.entry(4, v))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return inputList.stream()
