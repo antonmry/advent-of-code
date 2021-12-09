@@ -18,7 +18,6 @@ package com.galiglobal.advent.year2021;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Challenge8_2 {
@@ -50,12 +49,12 @@ public class Challenge8_2 {
 
     private static Map<String, String> buildDictionary(List<String> inputList) {
         final Map<Integer, String> partialDictionary = inputList.stream()
+                .filter(s -> (s.length() == 2) | (s.length() == 4))
                 .map(s -> switch (s.length()) {
                 case 2 -> Map.entry(1, s);
                 case 4 -> Map.entry(4, s);
-                default -> null;
+                default -> throw new RuntimeException();
                 })
-                .filter(Objects::nonNull) // TODO: how do we avoid this?
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return inputList.stream()
