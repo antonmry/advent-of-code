@@ -17,6 +17,7 @@ package com.galiglobal.advent.year2021;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class Challenge9_1 {
@@ -26,43 +27,41 @@ public class Challenge9_1 {
         final List<List<Integer>> inputList = getInputList(input);
 
         return IntStream.range(0, inputList.size())
-            .map(y -> IntStream.range(0, inputList.get(y).size())
-                .map(x -> getLowPoint(inputList, x, y))
-                .filter(v -> v >= 0)
-                .map(v -> v + 1)
-                .sum()
-            ).sum();
+                .map(y -> IntStream.range(0, inputList.get(y).size())
+                        .mapToObj(x -> getLowPoint(inputList, x, y))
+                        .filter(l -> l.isPresent()) // TODO: is it possible to combine filter and map?
+                        .mapToInt(Optional::get)
+                        .map(v -> v + 1)
+                        .sum())
+                .sum();
     }
 
     private static List<List<Integer>> getInputList(String input) {
         return Arrays.stream(input.split(System.getProperty("line.separator")))
-            .map(s -> s.chars() // TODO: easiest way?
-                .mapToObj(c -> String.valueOf((char) c))
-                .map(Integer::parseInt)
-                .toList())
-            .toList();
+                .map(s -> s.chars() // TODO: easiest way?
+                        .mapToObj(c -> String.valueOf((char) c))
+                        .map(Integer::parseInt)
+                        .toList())
+                .toList();
     }
 
-    private static int getLowPoint(List<List<Integer>> inputList, int x, int y) {
+    private static Optional<Integer> getLowPoint(List<List<Integer>> inputList, int x, int y) {
         // up
         if ((y > 0) && (inputList.get(y).get(x) >= inputList.get(y - 1).get(x)))
-            // TODO: refactor to use Optional
-            return -1;
+            return Optional.empty();
 
         // above
         if ((y < inputList.size() - 1) && (inputList.get(y).get(x) >= inputList.get(y + 1).get(x)))
-            return -1;
+            return Optional.empty();
 
         // left
         if ((x > 0) && (inputList.get(y).get(x) >= inputList.get(y).get(x - 1)))
-            return -1;
+            return Optional.empty();
 
         // right
         if ((x < inputList.get(y).size() - 1) && (inputList.get(y).get(x) >= inputList.get(y).get(x + 1)))
-            return -1;
+            return Optional.empty();
 
- //       System.out.println("inputList = " + inputList.get(y).get(x) + ", x: " + x + ", y:" + y);
-
-        return inputList.get(y).get(x);
+        return Optional.of(inputList.get(y).get(x));
     }
 }
