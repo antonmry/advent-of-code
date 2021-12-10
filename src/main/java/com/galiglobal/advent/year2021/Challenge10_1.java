@@ -23,59 +23,100 @@ import java.util.Map;
 public class Challenge10_1 {
 
     private final static Map<String, Integer> illegalCharPoints = Map.of(
-            ")", 3,
-            "]", 57,
-            "}", 1197,
-            ">", 25137);
+        ")", 3,
+        "]", 57,
+        "}", 1197,
+        ">", 25137);
 
     public static long getTotalSyntaxErrorScore(String input) {
+
         final List<List<String>> inputList = getInputList(input);
 
+        return inputList.stream()
+            .mapToLong(Challenge10_1::getTotal2)
+            .sum();
+    }
+
+    private static long getTotal2(List<String> line) {
+        return getSyntaxErrorScore(0, line, "");
+    }
+
+    private static long getSyntaxErrorScore(int score, List<String> line, String lastMatch) {
+        if (line.size() == 0) return score;
+
+        if (List.of("(", "[", "{", "<").contains(line.get(0))) {
+            final long syntaxErrorScore = getSyntaxErrorScore(score, line.subList(1, line.size() - 2), line.get(0));
+
+            return (syntaxErrorScore > 0) ? syntaxErrorScore :
+                getSyntaxErrorScore(score, line.subList(1, line.size() - 2), lastMatch);
+        }
+
+        String match = line.get(0);
+        String poll = lastMatch;
+
+        if (("(").equals(poll) && !(")".equals(match))) {
+            return illegalCharPoints.get(match);
+        }
+
+        if (("[").equals(poll) && !("]".equals(match))) {
+            return illegalCharPoints.get(match);
+        }
+
+        if (("{").equals(poll) && !("}".equals(match))) {
+            return illegalCharPoints.get(match);
+        }
+
+        if (("<").equals(poll) && !(">".equals(match))) {
+            return illegalCharPoints.get(match);
+        }
+
+        return getSyntaxErrorScore(score, line.subList(1, line.size() - 1), line.get(0));
+    }
+
+    private static long getTotal(List<String> line) {
+        LinkedList<String> q = new LinkedList<>();
         long total = 0;
-        for (List<String> line : inputList) {
-            LinkedList<String> q = new LinkedList<>();
-            for (String match : line) {
-                if (List.of("(", "[", "{", "<").contains(match))
-                    q.add(match);
-                else {
-                    final String poll = q.pollLast();
 
-                    if (poll == null) {
-                        total += illegalCharPoints.get(match);
-                        break;
-                    }
+        for (String match : line) {
+            if (List.of("(", "[", "{", "<").contains(match))
+                q.add(match);
+            else {
+                final String poll = q.pollLast();
 
-                    if (("(").equals(poll) && !(")".equals(match))) {
-                        total += illegalCharPoints.get(match);
-                        break;
-                    }
+                if (poll == null) {
+                    total += illegalCharPoints.get(match);
+                    break;
+                }
 
-                    if (("[").equals(poll) && !("]".equals(match))) {
-                        total += illegalCharPoints.get(match);
-                        break;
-                    }
+                if (("(").equals(poll) && !(")".equals(match))) {
+                    total += illegalCharPoints.get(match);
+                    break;
+                }
 
-                    if (("{").equals(poll) && !("}".equals(match))) {
-                        total += illegalCharPoints.get(match);
-                        break;
-                    }
+                if (("[").equals(poll) && !("]".equals(match))) {
+                    total += illegalCharPoints.get(match);
+                    break;
+                }
 
-                    if (("<").equals(poll) && !(">".equals(match))) {
-                        total += illegalCharPoints.get(match);
-                        break;
-                    }
+                if (("{").equals(poll) && !("}".equals(match))) {
+                    total += illegalCharPoints.get(match);
+                    break;
+                }
+
+                if (("<").equals(poll) && !(">".equals(match))) {
+                    total += illegalCharPoints.get(match);
+                    break;
                 }
             }
         }
-
         return total;
     }
 
     private static List<List<String>> getInputList(String input) {
         return Arrays.stream(input.split(System.getProperty("line.separator")))
-                .map(s -> s.chars() // TODO: easiest way?
-                        .mapToObj(c -> String.valueOf((char) c))
-                        .toList())
-                .toList();
+            .map(s -> s.chars() // TODO: easiest way?
+                .mapToObj(c -> String.valueOf((char) c))
+                .toList())
+            .toList();
     }
 }
