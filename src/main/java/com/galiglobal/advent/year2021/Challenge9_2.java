@@ -29,8 +29,22 @@ public class Challenge9_2 {
     }
 
     public static long multiplyThreeLargestBasins(String input) {
-        final List<List<Integer>> inputList = getInputList(input);
 
+        final List<List<Integer>> inputList = getInputList(input);
+        final List<Point> lowPoints = getLowPoints(inputList);
+        return multiplyThreeBiggerBasinsCount(inputList, lowPoints);
+    }
+
+    private static List<List<Integer>> getInputList(String input) {
+        return Arrays.stream(input.split(System.getProperty("line.separator")))
+                .map(s -> s.chars()
+                        .mapToObj(c -> String.valueOf((char) c))
+                        .map(Integer::parseInt)
+                        .toList())
+                .toList();
+    }
+
+    private static List<Point> getLowPoints(List<List<Integer>> inputList) {
         final List<Point> lowPoints = IntStream.range(0, inputList.size())
                 .mapToObj(y -> IntStream.range(0, inputList.get(y).size())
                         .mapToObj(x -> getLowPoint(inputList, x, y))
@@ -39,7 +53,21 @@ public class Challenge9_2 {
                         .toList())
                 .flatMap(List::stream)
                 .toList();
+        return lowPoints;
+    }
 
+    private static Optional<Point> getLowPoint(List<List<Integer>> points, int x, int y) {
+        // This is ugly, ugly... I know
+        if (((y > 0) && (points.get(y).get(x) >= points.get(y - 1).get(x))) || // Up
+                ((y < points.size() - 1) && (points.get(y).get(x) >= points.get(y + 1).get(x))) || // Down
+                ((x > 0) && (points.get(y).get(x) >= points.get(y).get(x - 1))) || // Left
+                ((x < points.get(y).size() - 1) && (points.get(y).get(x) >= points.get(y).get(x + 1)))) // Right
+            return Optional.empty();
+
+        return Optional.of(new Point(x, y, points.get(y).get(x)));
+    }
+
+    private static Integer multiplyThreeBiggerBasinsCount(List<List<Integer>> inputList, List<Point> lowPoints) {
         return lowPoints.stream().map(l -> {
             final List<Point> emptyBasins = new ArrayList<>();
             return getBasins(inputList, emptyBasins, l);
@@ -50,58 +78,65 @@ public class Challenge9_2 {
                 .reduce(1, (a, b) -> a * b);
     }
 
-    private static List<Point> getBasins(List<List<Integer>> inputList, List<Point> basin, Point p) {
+    private static List<Point> getBasins(List<List<Integer>> points, List<Point> basin, Point point) {
 
-        if (basin.contains(p))
-            return basin;
+        HashSet<Point> basinTemp = new HashSet<>(Stream.concat(basin.stream(), Stream.of(point)).toList());
 
-        HashSet<Point> basinTemp = new HashSet<>(Stream.concat(basin.stream(), Stream.of(p)).toList());
+        // TODO: we should avoid DRI here, I keep it to show the recursive call to getBasins
+        basinTemp.addAll(
+                lowerUp(point, points).stream()
+                        .filter(p -> !basinTemp.contains(p))
+                        .map(p -> getBasins(points, basinTemp.stream().toList(), p))
+                        .flatMap(List::stream)
+                        .toList());
 
-        // Up
-        if ((p.y > 0) && (inputList.get(p.y - 1).get(p.x) < 9) && !basinTemp.contains(inputList.get(p.y - 1).get(p.x)))
-            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x, p.y - 1, inputList.get(p.y - 1).get(p.x))));
+        basinTemp.addAll(
+                lowerDown(point, points).stream()
+                        .filter(p -> !basinTemp.contains(p))
+                        .map(p -> getBasins(points, basinTemp.stream().toList(), p))
+                        .flatMap(List::stream)
+                        .toList());
 
-        // Down
-        if ((p.y < inputList.size() - 1) && (inputList.get(p.y + 1).get(p.x) < 9) && !basinTemp.contains(inputList.get(p.y + 1).get(p.x) < 9))
-            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x, p.y + 1, inputList.get(p.y + 1).get(p.x))));
+        basinTemp.addAll(
+                lowerLeft(point, points).stream()
+                        .filter(p -> !basinTemp.contains(p))
+                        .map(p -> getBasins(points, basinTemp.stream().toList(), p))
+                        .flatMap(List::stream)
+                        .toList());
 
-        // left
-        if ((p.x > 0) && (inputList.get(p.y).get(p.x - 1) < 9) && !basinTemp.contains(inputList.get(p.y).get(p.x - 1)))
-            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x - 1, p.y, inputList.get(p.y).get(p.x - 1))));
-
-        // right
-        if ((p.x < inputList.get(p.y).size() - 1) && (inputList.get(p.y).get(p.x + 1) < 9) && !basinTemp.contains(inputList.get(p.y).get(p.x + 1)))
-            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x + 1, p.y, inputList.get(p.y).get(p.x + 1))));
+        basinTemp.addAll(
+                lowerRigth(point, points).stream()
+                        .filter(p -> !basinTemp.contains(p))
+                        .map(p -> getBasins(points, basinTemp.stream().toList(), p))
+                        .flatMap(List::stream)
+                        .toList());
 
         return basinTemp.stream().toList();
     }
 
-    private static List<List<Integer>> getInputList(String input) {
-        return Arrays.stream(input.split(System.getProperty("line.separator")))
-                .map(s -> s.chars() // TODO: easiest way?
-                        .mapToObj(c -> String.valueOf((char) c))
-                        .map(Integer::parseInt)
-                        .toList())
-                .toList();
+    // TODO: improve this
+    private static Optional<Point> lowerUp(Point p, List<List<Integer>> points) {
+        if ((p.y > 0) && (points.get(p.y - 1).get(p.x) < 9))
+            return Optional.of(new Point(p.x, p.y - 1, points.get(p.y - 1).get(p.x)));
+        return Optional.empty();
     }
 
-    private static Optional<Point> getLowPoint(List<List<Integer>> inputList, int x, int y) {
-        // up
-        if ((y > 0) && (inputList.get(y).get(x) >= inputList.get(y - 1).get(x)))
-            return Optional.empty();
-
-        // above
-        if ((y < inputList.size() - 1) && (inputList.get(y).get(x) >= inputList.get(y + 1).get(x)))
-            return Optional.empty();
-
-        // left
-        if ((x > 0) && (inputList.get(y).get(x) >= inputList.get(y).get(x - 1)))
-            return Optional.empty();
-
-        // right
-        if ((x < inputList.get(y).size() - 1) && (inputList.get(y).get(x) >= inputList.get(y).get(x + 1)))
-            return Optional.empty();
-
-        return Optional.of(new Point(x, y, inputList.get(y).get(x)));
+    private static Optional<Point> lowerDown(Point p, List<List<Integer>> points) {
+        if ((p.y < points.size() - 1) && (points.get(p.y + 1).get(p.x) < 9))
+            return Optional.of(new Point(p.x, p.y + 1, points.get(p.y + 1).get(p.x)));
+        return Optional.empty();
     }
+
+    private static Optional<Point> lowerLeft(Point p, List<List<Integer>> points) {
+        if ((p.x > 0) && (points.get(p.y).get(p.x - 1) < 9))
+            return Optional.of(new Point(p.x - 1, p.y, points.get(p.y).get(p.x - 1)));
+        return Optional.empty();
+    }
+
+    private static Optional<Point> lowerRigth(Point p, List<List<Integer>> points) {
+        if ((p.x < points.get(p.y).size() - 1) && (points.get(p.y).get(p.x + 1) < 9))
+            return Optional.of(new Point(p.x + 1, p.y, points.get(p.y).get(p.x + 1)));
+        return Optional.empty();
+    }
+
 }
