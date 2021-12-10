@@ -17,114 +17,72 @@ package com.galiglobal.advent.year2021;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Challenge9_2 {
 
     private record Point(int x, int y, int height) {
     }
 
-    private enum LastDirection {
-        LEFT,
-        RIGTH,
-        UP,
-        DOWN,
-        ANY
-    }
-
     public static long multiplyThreeLargestBasins(String input) {
         final List<List<Integer>> inputList = getInputList(input);
 
         final List<Point> lowPoints = IntStream.range(0, inputList.size())
-            .mapToObj(y -> IntStream.range(0, inputList.get(y).size())
-                .mapToObj(x -> getLowPoint(inputList, x, y))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList()
-            ).flatMap(List::stream)
-            .toList();
+                .mapToObj(y -> IntStream.range(0, inputList.get(y).size())
+                        .mapToObj(x -> getLowPoint(inputList, x, y))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .toList())
+                .flatMap(List::stream)
+                .toList();
 
-        //Create basin
-        final List<List<Point>> basins = lowPoints.stream().map(l -> {
-                final List<Point> emptyBasins = List.of();
-                return getBasins(inputList, emptyBasins, l, LastDirection.ANY);
-            })
-            .toList();
-
-        return 0;
+        return lowPoints.stream().map(l -> {
+            final List<Point> emptyBasins = new ArrayList<>();
+            return getBasins(inputList, emptyBasins, l);
+        })
+                .map(List::size)
+                .sorted()
+                .skip(lowPoints.size() - 3)
+                .reduce(1, (a, b) -> a * b);
     }
 
-    private static List<Point> getBasins(List<List<Integer>> inputList, List<Point> basin, Point p, LastDirection lastDirection) {
+    private static List<Point> getBasins(List<List<Integer>> inputList, List<Point> basin, Point p) {
 
-        System.out.println("p = " + p);
-        if (!isEndOfBasin(inputList, p, lastDirection)) return List.of(p);
-        System.out.println("p not returned = " + p);
+        if (basin.contains(p))
+            return basin;
 
-        //final List<Point> basinTemp = Stream.concat(basin.stream(), Stream.of(p)).toList();
-        //List<Point> basinTemp = new ArrayList<>(Stream.concat(basin.stream(), Stream.of(p)).toList());
-        List<Point> basinTemp = new ArrayList<>(basin.stream().toList());
+        HashSet<Point> basinTemp = new HashSet<>(Stream.concat(basin.stream(), Stream.of(p)).toList());
 
         // Up
-        if ((p.y > 0) && (inputList.get(p.y - 1).get(p.x) < 9) && !lastDirection.equals(LastDirection.DOWN))
-            basinTemp.addAll(getBasins(inputList, basinTemp, new Point(p.x, p.y - 1, inputList.get(p.y - 1).get(p.x)), LastDirection.DOWN));
+        if ((p.y > 0) && (inputList.get(p.y - 1).get(p.x) < 9) && !basinTemp.contains(inputList.get(p.y - 1).get(p.x)))
+            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x, p.y - 1, inputList.get(p.y - 1).get(p.x))));
 
         // Down
-/*
-        if ((p.y < inputList.size() - 1) && (inputList.get(p.y + 1).get(p.x) < 9) && !lastDirection.equals(LastDirection.UP))
-            basinTemp.addAll(getBasins(inputList, basin, new Point(p.x, p.y + 1, inputList.get(p.y + 1).get(p.x)), LastDirection.UP));
-*/
-
-        return basinTemp;
-/*
-        // up
-        if ((p.y > 0) && (inputList.get(p.y - 1).get(p.x) < 9))
-            return getBasins(inputList, basin, new Point(p.x, p.y - 1, inputList.get(p.y - 1).get(p.x)));
-
-        // above
-        if ((p.y < inputList.size() - 1) && (inputList.get(p.y + 1).get(p.x) < 9))
-            return getBasins(inputList, basin, new Point(p.x, p.y + 1, inputList.get(p.y + 1).get(p.x)));
+        if ((p.y < inputList.size() - 1) && (inputList.get(p.y + 1).get(p.x) < 9) && !basinTemp.contains(inputList.get(p.y + 1).get(p.x) < 9))
+            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x, p.y + 1, inputList.get(p.y + 1).get(p.x))));
 
         // left
-        if ((p.x > 0) && (inputList.get(p.y).get(p.x - 1) < 9))
-            return getBasins(inputList, basin, new Point(p.x - 1, p.y, inputList.get(p.y).get(p.x - 1)));
+        if ((p.x > 0) && (inputList.get(p.y).get(p.x - 1) < 9) && !basinTemp.contains(inputList.get(p.y).get(p.x - 1)))
+            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x - 1, p.y, inputList.get(p.y).get(p.x - 1))));
 
         // right
-        if ((p.x > inputList.get(p.y).size() - 1) && (inputList.get(p.y).get(p.x + 1) < 9))
-            return getBasins(inputList, basin, new Point(p.x + 1, p.y, inputList.get(p.y).get(p.x + 1)));
+        if ((p.x < inputList.get(p.y).size() - 1) && (inputList.get(p.y).get(p.x + 1) < 9) && !basinTemp.contains(inputList.get(p.y).get(p.x + 1)))
+            basinTemp.addAll(getBasins(inputList, basinTemp.stream().toList(), new Point(p.x + 1, p.y, inputList.get(p.y).get(p.x + 1))));
 
-        basin.add(p); // TODO: immutable list!!
-        return basin;
-*/
-    }
-
-    private static boolean isEndOfBasin(List<List<Integer>> inputList, Point p, LastDirection lastDirection) {
-        // Up
-        if ((p.y > 0) && (inputList.get(p.y - 1).get(p.x) < 9) && !lastDirection.equals(LastDirection.DOWN)) return true;
-
-        // Down
-        if ((p.y < inputList.size() - 1) && (inputList.get(p.y + 1).get(p.x) < 9) && !lastDirection.equals(LastDirection.UP))
-            return true;
-
-        //Left
-        if ((p.x > 0) && (inputList.get(p.y).get(p.x - 1) < 9) && !lastDirection.equals(LastDirection.RIGTH))
-            return true;
-
-        // Right
-        if ((p.x > inputList.get(p.y).size() - 1) && (inputList.get(p.y).get(p.x + 1) < 9) && !lastDirection.equals(LastDirection.LEFT))
-            return true;
-
-        return false;
+        return basinTemp.stream().toList();
     }
 
     private static List<List<Integer>> getInputList(String input) {
         return Arrays.stream(input.split(System.getProperty("line.separator")))
-            .map(s -> s.chars() // TODO: easiest way?
-                .mapToObj(c -> String.valueOf((char) c))
-                .map(Integer::parseInt)
-                .toList())
-            .toList();
+                .map(s -> s.chars() // TODO: easiest way?
+                        .mapToObj(c -> String.valueOf((char) c))
+                        .map(Integer::parseInt)
+                        .toList())
+                .toList();
     }
 
     private static Optional<Point> getLowPoint(List<List<Integer>> inputList, int x, int y) {

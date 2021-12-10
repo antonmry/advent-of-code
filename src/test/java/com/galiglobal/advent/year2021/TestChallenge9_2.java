@@ -18,7 +18,6 @@ package com.galiglobal.advent.year2021;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class TestChallenge9_2 {
 
@@ -29,7 +28,7 @@ class TestChallenge9_2 {
 
     @Test
     void testChallenge() {
-        assertEquals(-1, Challenge9_2.multiplyThreeLargestBasins(challenge));
+        assertEquals(858494, Challenge9_2.multiplyThreeLargestBasins(challenge));
     }
 
     private static final String example = """
