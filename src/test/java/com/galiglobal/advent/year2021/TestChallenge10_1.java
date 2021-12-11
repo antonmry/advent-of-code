@@ -27,9 +27,17 @@ class TestChallenge10_1 {
     }
 
     @Test
+    void testExample0() {
+        assertEquals(0, Challenge10_1.getTotalSyntaxErrorScore(example0));
+    }
+
+    @Test
     void testChallenge() {
         assertEquals(392421, Challenge10_1.getTotalSyntaxErrorScore(challenge));
     }
+
+    private static final String example0 = """
+            [({(<(())[]>[[{[]{<()<>>""";
 
     private static final String example = """
             [({(<(())[]>[[{[]{<()<>>
