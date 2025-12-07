@@ -1,0 +1,34 @@
+# Build artifacts
+target/
+**/target/
+target/
+
+# Dependencies
+# Keep Cargo.lock for binaries; remove this line if publishing a library
+# Cargo.lock
+
+# Editors/IDEs
+.idea/
+.vscode/
+*.swp
+*.iml
+
+# Logs and dumps
+*.log
+*.out
+*.profraw
+*.dSYM
+
+# Rust tooling
+**/*.rs.bk
+.cargo/
+.rustup/
+
+# Coverage
+coverage/
+*.lcov
+*.profdata
+
+# Misc
+.DS_Store
+Thumbs.db
