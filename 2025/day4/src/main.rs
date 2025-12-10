@@ -17,43 +17,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|l| grid.add_row(&l.unwrap()))
         .for_each(|l| l.expect("All lines should be valid"));
 
-    // dbg!(&grid);
     println! {"Result: {}", sum_ats(grid)}
     Ok(())
 }
 
 fn sum_ats(grid: Grid) -> usize {
-    let mut rec: usize = 0;
     let mut result: usize = 0;
     for r in 0..grid.rows.len() {
         for c in 0..grid.rows[r].len() {
+            if grid.get(r, c) == Some(0) {
+                continue; // Early optimization, not needed
+            }
+            let mut rec = 0;
             for i in -1isize..=1 {
                 for j in -1isize..=1 {
-                    if let Some(z) = grid.get(r, c) {
-                        if z == 0 {
-                            break;
-                        }
-                    }
-
                     if r as isize + i >= 0 && c as isize + j >= 0 && (i != 0 || j != 0) {
-                        let z = grid.get((r as isize + i) as usize, (c as isize + j) as usize);
-                        // println!("Found {z:?} in {r}-{c}-{i}-{j}");
-                        if let Some(z) = z {
-                            rec += z as usize;
-                        }
+                        rec += grid
+                            .get((r as isize + i) as usize, (c as isize + j) as usize)
+                            .unwrap_or(0) as usize;
                     }
                 }
             }
-            // println!(
-            //     "{:?}: result: {result}, rec: {rec}, r: {r}, w:{c}",
-            //     grid.get(r, c)
-            // );
-            if let Some(z) = grid.get(r, c) {
-                if z == 1 && rec < 4 {
-                    result += 1;
-                }
+            if rec < 4 {
+                result += grid.get(r, c).unwrap_or(0) as usize;
             }
-            rec = 0;
         }
     }
     result
