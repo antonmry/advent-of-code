@@ -14,11 +14,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     get_ranges(&mut reader, &mut ingredient_range)?;
     println!(
         "Answer part1: {:?}",
-        get_total_fresh_ingredients(&mut reader, &mut ingredient_range)
+        get_total_fresh_ingredients(&mut reader, &ingredient_range)
     );
 
-    while remove_overlap(&mut ingredient_range) {
-        // keep collapsing overlaps until none remain
+    let mut changed = true;
+    while changed {
+        let (next, merged) = remove_overlap(ingredient_range);
+        ingredient_range = next;
+        changed = merged;
     }
 
     println!("Answer part2: {:?}", count_ingredients(&ingredient_range));
@@ -28,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn get_total_fresh_ingredients<R: BufRead>(
     reader: &mut R,
-    food: &mut FoodRange,
+    food: &FoodRange,
 ) -> Result<usize, Box<dyn std::error::Error>> {
     reader.lines().try_fold(0usize, |acc, line| {
         let value = line?.parse::<usize>()?;
@@ -41,34 +44,31 @@ fn count_ingredients(food: &FoodRange) -> usize {
     food.ranges.iter().map(|r| *r.end() - *r.start() + 1).sum()
 }
 
-fn remove_overlap(ingredient_range: &mut FoodRange) -> bool {
-    let mut ingredient_range_without_overlap: Vec<core::ops::RangeInclusive<usize>> = Vec::new();
+fn remove_overlap(mut ingredient_range: FoodRange) -> (FoodRange, bool) {
+    if ingredient_range.ranges.is_empty() {
+        return (ingredient_range, false);
+    }
 
-    let mut found_overlap = false;
-    let mut i = ingredient_range.clone();
-    'outer: while let Some(one) = i.ranges.pop() {
-        for two in i.ranges.iter() {
-            if *one.start() >= *two.start() && *one.end() <= *two.end() {
-                continue 'outer;
-            }
+    ingredient_range.ranges.sort_by_key(|range| *range.start());
 
-            if *two.end() >= *one.start() && *one.end() >= *two.start() && one != *two {
-                let st = usize::min(*one.start(), *two.start());
-                let en = usize::max(*one.end(), *two.end());
-                ingredient_range_without_overlap.push(st..=en);
-                found_overlap = true;
-                continue 'outer;
+    let mut merged: Vec<core::ops::RangeInclusive<usize>> = Vec::new();
+    let mut changed = false;
+
+    for range in ingredient_range.ranges.drain(..) {
+        if let Some(last) = merged.last_mut() {
+            if *range.start() <= *last.end() {
+                let start = *last.start();
+                let end = usize::max(*last.end(), *range.end());
+                *last = start..=end;
+                changed = true;
+                continue;
             }
         }
 
-        ingredient_range_without_overlap.push(one);
+        merged.push(range);
     }
 
-    *ingredient_range = FoodRange {
-        ranges: ingredient_range_without_overlap,
-    };
-
-    found_overlap
+    (FoodRange { ranges: merged }, changed)
 }
 
 fn get_ranges<R: BufRead>(
@@ -138,7 +138,12 @@ mod tests {
         let _ =
             get_total_fresh_ingredients(&mut reader, &mut ingredient_range).expect("parse failed");
 
-        while remove_overlap(&mut ingredient_range) {}
+        let mut changed = true;
+        while changed {
+            let (next, merged) = remove_overlap(ingredient_range);
+            ingredient_range = next;
+            changed = merged;
+        }
         assert_eq!(14, count_ingredients(&ingredient_range));
     }
 }
