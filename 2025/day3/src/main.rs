@@ -24,7 +24,7 @@ pub fn largest_joltage(reading: &str) -> usize {
         })
         .unwrap();
 
-    let second = reading.get(idx + 1..reading.len()).unwrap();
+    let second = reading.get(idx + 1..).unwrap();
     let val2 = second
         .chars()
         .map(|ch| ch.to_digit(10).unwrap() as usize)
