@@ -2,7 +2,7 @@ use std::fmt;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Grid {
     rows: Vec<Vec<u8>>,
     cols: usize,
@@ -17,29 +17,41 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|l| grid.add_row(&l.unwrap()))
         .for_each(|l| l.expect("All lines should be valid"));
 
-    println! {"Result: {}", sum_ats(grid)}
+    let answer1 = sum_and_delete_rolls(&mut grid);
+
+    let answer2: usize = answer1
+        + std::iter::from_fn(|| {
+            let n = sum_and_delete_rolls(&mut grid);
+            (n > 0).then_some(n)
+        })
+        .sum::<usize>();
+
+    println!("Answer part 1: {answer1}");
+    println!("Answer part 2: {answer2}");
     Ok(())
 }
 
-fn sum_ats(grid: Grid) -> usize {
+fn sum_and_delete_rolls(grid: &mut Grid) -> usize {
+    let grid_clone = grid.clone();
     let mut result: usize = 0;
-    for r in 0..grid.rows.len() {
-        for c in 0..grid.rows[r].len() {
-            if grid.get(r, c) == Some(0) {
+    for r in 0..grid_clone.rows.len() {
+        for c in 0..grid_clone.rows[r].len() {
+            if grid_clone.get(r, c) == Some(0) {
                 continue; // Early optimization, not needed
             }
             let mut rec = 0;
             for i in -1isize..=1 {
                 for j in -1isize..=1 {
                     if r as isize + i >= 0 && c as isize + j >= 0 && (i != 0 || j != 0) {
-                        rec += grid
+                        rec += grid_clone
                             .get((r as isize + i) as usize, (c as isize + j) as usize)
                             .unwrap_or(0) as usize;
                     }
                 }
             }
             if rec < 4 {
-                result += grid.get(r, c).unwrap_or(0) as usize;
+                result += grid_clone.get(r, c).unwrap_or(0) as usize;
+                grid.rows[r][c] = 0;
             }
         }
     }
@@ -116,7 +128,7 @@ mod tests {
         }
         println!("{}", grid);
 
-        assert_eq!(13, sum_ats(grid));
+        assert_eq!(13, sum_and_delete_rolls(&mut grid));
     }
 
     #[test]
@@ -132,5 +144,25 @@ mod tests {
         assert_eq!(grid.get(9, 9), Some(0));
         assert_eq!(grid.get(9, 0), Some(1));
         assert_eq!(grid.get(10, 0), None);
+    }
+    #[test]
+    fn sum_deletes_sample_grid() {
+        let mut grid = Grid::default();
+        for line in SAMPLE {
+            grid.add_row(line).expect("valid sample row");
+        }
+
+        let mut answer = 0;
+        loop {
+            let result = sum_and_delete_rolls(&mut grid);
+            if result == 0 {
+                break;
+            } else {
+                println!("Deleted {result} rolls");
+                answer += result;
+            }
+        }
+
+        assert_eq!(43, answer);
     }
 }
