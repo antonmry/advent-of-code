@@ -12,31 +12,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         manifold.push(line?.chars().collect());
     }
 
-    // dbg! {&manifold};
-    let result1 = count_splits(&mut manifold);
+    let result1 = count_splits(&mut manifold.clone());
+    assert_eq!(1579, result1);
     println! {"Result part 1: {}", result1};
-    assert!(result1 > 952);
+
+    let result2 = count_timelines(&manifold);
+    assert_eq!(13418215871354, result2);
+    println! {"Result part 2: {}", result2};
+
     Ok(())
 }
 
-fn count_splits(manifold: &mut Vec<Vec<char>>) -> usize {
+fn count_splits(manifold: &mut [Vec<char>]) -> usize {
     let mut result = 0;
-    for (y, row) in manifold.clone().iter().enumerate() {
-        //let row = manifold[y].clone();
-        // for x in 0..row.len() {
-        for (x, cell) in row.iter().enumerate() {
-            match cell {
+    for y in 0..manifold.len() {
+        for x in 0..manifold[y].len() {
+            match manifold[y][x] {
                 'S' => {
                     manifold[y + 1][x] = '|';
                 }
                 '^' => {
                     if manifold[y - 1][x] == '|' {
                         result += 1;
-                        if let Some(left) = manifold[y + 1].get_mut(x - 1) {
-                            *left = '|';
+                        if x > 0 {
+                            manifold[y + 1][x - 1] = '|';
                         }
-                        if let Some(right) = manifold[y + 1].get_mut(x + 1) {
-                            *right = '|';
+                        if x + 1 < manifold[y + 1].len() {
+                            manifold[y + 1][x + 1] = '|';
                         }
                     }
                 }
@@ -53,6 +55,31 @@ fn count_splits(manifold: &mut Vec<Vec<char>>) -> usize {
     result
 }
 
+fn count_timelines(manifold: &[Vec<char>]) -> usize {
+    let mut result: Vec<usize> = vec![0; manifold[0].len()];
+
+    for m in manifold {
+        for x in 0..m.len() {
+            match m[x] {
+                'S' => {
+                    result[x] = 1;
+                }
+                '^' => {
+                    if result[x] > 0 {
+                        result[x - 1] += result[x];
+                        result[x + 1] += result[x];
+                        result[x] = 0;
+                    }
+                }
+                '.' => continue,
+                '|' => continue,
+                _ => panic!("Character not allowed in input"),
+            }
+        }
+    }
+    result.iter().sum()
+}
+
 #[allow(dead_code)]
 fn print_grid(grid: &[Vec<char>]) {
     for row in grid {
@@ -64,7 +91,7 @@ fn print_grid(grid: &[Vec<char>]) {
 mod tests {
     use std::io::{BufRead, Cursor};
 
-    use crate::count_splits;
+    use crate::{count_splits, count_timelines};
 
     #[test]
     fn default_example() -> Result<(), Box<dyn std::error::Error>> {
@@ -93,8 +120,11 @@ mod tests {
         }
 
         let result = count_splits(&mut manifold);
-
         assert_eq!(21_usize, result);
+
+        let result = count_timelines(&manifold);
+        assert_eq!(40_usize, result);
+
         Ok(())
     }
 }
