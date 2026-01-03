@@ -41,8 +41,9 @@ fn part2(
 ) -> Result<Rectangle, Box<dyn std::error::Error>> {
     let start = Instant::now();
 
-    let mut green_tiles: HashSet<Point> = HashSet::new();
-    find_green_tiles(red_tiles, &mut green_tiles);
+    // TODO: it would be more efficient to check if the rectangle intersects without other
+    // rectangles. Only valid rectangles don't intersect with others.
+    let green_tiles = find_green_tiles(red_tiles);
     println!("Find: {:#?}", start.elapsed());
 
     // Convert red/green tiles into ranges by row (more efficient)
@@ -57,7 +58,7 @@ fn part2(
     }
     println!("Ranges: {:#?}", start.elapsed());
 
-    // Find the biggest valid rectangle
+    // Find the biggest valid rectangle checking ranges by row
     for r in rectangles {
         let (x1, x2) = (r.c1.x.min(r.c2.x), r.c1.x.max(r.c2.x));
         let (y1, y2) = (r.c1.y.min(r.c2.y), r.c1.y.max(r.c2.y));
@@ -76,8 +77,9 @@ fn part2(
     Err("Rectangles not found".into())
 }
 
-fn find_green_tiles(red_tiles: &[Point], green_tiles: &mut HashSet<Point>) {
-    // Find green tiles
+fn find_green_tiles(red_tiles: &[Point]) -> HashSet<Point> {
+    let mut green_tiles: HashSet<Point> = HashSet::new();
+
     for tile in red_tiles {
         // Points horizontal
         if let Some(right) = red_tiles
@@ -101,6 +103,8 @@ fn find_green_tiles(red_tiles: &[Point], green_tiles: &mut HashSet<Point>) {
             }
         }
     }
+
+    green_tiles
 }
 
 fn list_rectangles(tiles: &[Point]) -> Vec<Rectangle> {
