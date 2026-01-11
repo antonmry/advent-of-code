@@ -6,7 +6,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!("71,50,92", result);
     let result = part2(&input);
     assert_eq!(687, result);
+    let result = part3(&input);
+    assert_eq!(10109, result);
     Ok(())
+}
+
+#[repr(usize)]
+#[derive(Hash, Eq, PartialEq)]
+enum BushType {
+    Red = 5,
+    Green = 2,
+    Blue = 4,
+    Special = 10,
 }
 
 fn part1(input: &str) -> &str {
@@ -35,6 +46,29 @@ fn part2(input: &str) -> usize {
             (green > red) && (green > blue) && (blue != red)
         })
         .count()
+}
+
+fn part3(input: &str) -> usize {
+    input
+        .lines()
+        .map(|line| {
+            let mut c = line.split(',');
+
+            let red = c.next().unwrap().parse::<usize>().unwrap();
+            let green = c.next().unwrap().parse::<usize>().unwrap();
+            let blue = c.next().unwrap().parse::<usize>().unwrap();
+
+            if (red == green) || (green == blue) || (blue == red) {
+                BushType::Special as usize
+            } else if (red > green) && (red > blue) {
+                BushType::Red as usize
+            } else if (green > red) && (green > blue) {
+                BushType::Green as usize
+            } else {
+                BushType::Blue as usize
+            }
+        })
+        .sum()
 }
 
 #[cfg(test)]
